@@ -7,6 +7,8 @@
 #include "bread.h"
 //brennan.io/2015/01/16/write-a-shell-in-c/ (Quelle)
 
+//We thank buffet and his wonderful bread 
+
 //Farben
 void red() {printf("\033[0;31m");}
 void bold_red() {printf("\033[1;31m");}
@@ -49,6 +51,7 @@ void greet(){
     printf("%s ", current);
   }
 }
+
 void fake(){
   char fake[] = "You thought I would let you escape, you unfunky son of a bitch?!\n";
   char *current = strtok(fake, " ");
@@ -57,6 +60,7 @@ void fake(){
     printf("%s ", current);
   }
 }
+
 void greet2(){
   char greet2[] = "See you soon, you funky Funk!\n";
   char *current = strtok(greet2, " ");
@@ -65,6 +69,7 @@ void greet2(){
     printf("%s ", current);
   }
 }
+
 //TODO: token parser
 /*zerstückelt die vom User eingegebene Zeile in einzelne Argumente
 im großen und ganzen wie read_line aufgebaut*/
@@ -117,7 +122,7 @@ int shell_launch(char **args) {
 
 //eingebaute befehle-----------------------------------------
 int shell_help(char **args);
-int shell_cd(int argc,char **args);
+int shell_cd(char **args);
 int shell_funkyexit(char **args);
 int shell_funk(char **args);
 int shell_genocide(char **args);
@@ -146,10 +151,12 @@ int (*built_in_f[]) (char **) = {
 int funk_num_builtins(){
   return sizeof(built_in_str)/sizeof(char *);
 }
+
 int shell_genocide(char **args){
   system("shutdown -h now");
   return 0;
 }
+
 //hilfe
 int shell_help(char **args) {
   bold_red();
@@ -161,9 +168,10 @@ int shell_help(char **args) {
   reset();
   return 1;
 }
+
 //wechselt das verzeichnis
-int shell_cd(int argc, char **args) {
-  if (argc < 2){
+int shell_cd(char **args) {
+  if(args[1] == NULL) {
     args[1] = getenv("HOME");
   }
   if(chdir(args[1]) != 0) {
@@ -172,6 +180,7 @@ int shell_cd(int argc, char **args) {
   }
   return 1;
 }
+
 //verlässt die shell
 int shell_funkyexit(char **args){
   return 0;
@@ -204,6 +213,7 @@ int execute(char **args) {
   }
   return shell_launch(args);
 }
+
 //haupt Funk
 void Funk_loop(void){
   char *line;
