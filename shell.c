@@ -117,7 +117,7 @@ int shell_launch(char **args) {
 
 //eingebaute befehle-----------------------------------------
 int shell_help(char **args);
-int shell_cd(char **args);
+int shell_cd(int argc,char **args);
 int shell_funkyexit(char **args);
 int shell_funk(char **args);
 int shell_genocide(char **args);
@@ -162,8 +162,15 @@ int shell_help(char **args) {
   return 1;
 }
 //wechselt das verzeichnis
-int shell_cd(char **args) {
-
+int shell_cd(int argc, char **args) {
+  if (argc < 2){
+    args[1] = getenv("HOME");
+  }
+  if(chdir(args[1]) != 0) {
+    bold_red();
+    perror("not very funky");
+  }
+  return 1;
 }
 //verlässt die shell
 int shell_funkyexit(char **args){
