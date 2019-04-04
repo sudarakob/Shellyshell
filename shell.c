@@ -4,7 +4,9 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include <time.h>
+#include "bread.h"
 //brennan.io/2015/01/16/write-a-shell-in-c/ (Quelle)
+
 //Farben
 void red() {printf("\033[0;31m");}
 void bold_red() {printf("\033[1;31m");}
@@ -19,6 +21,7 @@ void bold_magenta() {printf("\033[1;35m");}
 void cyan() {printf("\033[0;36m");}
 void bold_cyan() {printf("\033[1;36m");}
 void reset() {printf("\033[0m");}
+
 //zufallsfarben
 void funkyfunk() {
   switch(rand() % 11){
@@ -36,49 +39,37 @@ void funkyfunk() {
     case 11: bold_cyan(); break;
   }
 }
+
+//opening
 void greet(){
-  char greet[] =  "Wilkommen bei der funkingen Funk_shell, tippen sie help für Übersicht\n";
+  char greet[] = "Welcome to the funky Funk_shell, type help for overview!\n";
   char *current = strtok(greet, " ");
   for ( ;current != NULL; current= strtok(NULL, " ")){
     funkyfunk();
     printf("%s ", current);
   }
-
 }
-//liest die vom User eingegebene Zeile
-#define READLINE_BUFSIZE 1024 //Definiere Buffer in größe von 1024
-char *read_line(void){
-  int bufsize = READLINE_BUFSIZE;
-  int position = 0; //Position beim einlesen
-  char *buffer = malloc(sizeof(char) * bufsize); //1024 * größe unseren eingegeben string
-  int c; //Zähler
-
-  if (!buffer){
-    fprintf(stderr, "Funkiger Speicherzuordungsfehler \n");//fprintf zum schreiben von Informationen in Dateien
-    exit(EXIT_FAILURE);
-  }
-
-  while(1){
-    //lesen eines einzelnen zeichens
-    c = getchar();
-    //wenn EOF erreicht wird oder ein zeilenumbruch, wird dieser durch 0 ersetzt
-    if (c == EOF || c == '\n'){
-      buffer[position] = '\0';
-      return buffer;
-    } else {
-      buffer[position] = c;
-    }
-    position++; //erhöhe position um 1
-    if (position >= bufsize) {
-      bufsize += READLINE_BUFSIZE;
-      buffer[position] = c;
-    }
+void fake(){
+  char fake[] = "You thought I would let you escape, you unfunky son of a bitch?!\n";
+  char *current = strtok(fake, " ");
+  for ( ;current != NULL; current= strtok(NULL, " ")){
+    funkyfunk();
+    printf("%s ", current);
   }
 }
+void greet2(){
+  char greet2[] = "See you soon, you funky Funk!\n";
+  char *current = strtok(greet2, " ");
+  for ( ;current != NULL; current= strtok(NULL, " ")){
+    funkyfunk();
+    printf("%s ", current);
+  }
+}
+//TODO: token parser
 /*zerstückelt die vom User eingegebene Zeile in einzelne Argumente
 im großen und ganzen wie read_line aufgebaut*/
 #define TOKEN_BUFSIZE 64
-#define TOKEN_DELIM " \t\r\n\a"
+#define TOKEN_DELIM " \t\r\n"
 char **split_line(char *line){
   int position = 0, bufsize = TOKEN_BUFSIZE;
   char **tokens = malloc(sizeof(char*) * bufsize);
@@ -104,17 +95,18 @@ char **split_line(char *line){
   tokens[position] = NULL;
   return tokens;
 }
+
 int shell_launch(char **args) {
   pid_t pid, wpid;
   int status;
   pid = fork();
   if(pid == 0) {
     if(execvp(args[0], args) == -1) {
-      perror("Funk_shell");
+      perror("not very funky");
     }
     exit(EXIT_FAILURE);
   } else if(pid < 0) {
-    perror(" Funk_shell");
+    perror("not very funky");
   } else {
     do {
       wpid = waitpid(pid, &status, WUNTRACED);
@@ -122,29 +114,43 @@ int shell_launch(char **args) {
   }
   return 1;
 }
+
 //eingebaute befehle-----------------------------------------
 int shell_help(char **args);
 int shell_cd(char **args);
-int shell_exit(char **args);
+int shell_funkyexit(char **args);
 int shell_funk(char **args);
+int shell_genocide(char **args);
+int shell_exit(char **args);
 //-----------------------------------------------------------
+
 //Strings die zu den Befehlen gehören
 char *built_in_str[] = {
   "help",
   "cd",
-  "exit",
-  "funk"
+  "funkyexit",
+  "funk",
+  "genocide",
+  "exit"
 };
+
 int (*built_in_f[]) (char **) = {
   &shell_help,
   &shell_cd,
-  &shell_exit,
-  &shell_funk
+  &shell_funkyexit,
+  &shell_funk,
+  &shell_genocide,
+  &shell_exit
 };
+
 int funk_num_builtins(){
   return sizeof(built_in_str)/sizeof(char *);
 }
-//ruft die funkigen Funktionen
+int shell_genocide(char **args){
+  system("shutdown -h now");
+  return 0;
+}
+//hilfe
 int shell_help(char **args) {
   bold_red();
   printf("\nDie Funk_shell beinhaltet folgende eingebaute Befehle:\n\n");
@@ -155,12 +161,21 @@ int shell_help(char **args) {
   reset();
   return 1;
 }
+//wechselt das verzeichnis
 int shell_cd(char **args) {
 
 }
-int shell_exit(char **args){
+//verlässt die shell
+int shell_funkyexit(char **args){
+  return 0;
 
 }
+
+int shell_exit(char **args){
+  fake();
+  return 1;
+}
+//easteregg
 int shell_funk(char **args) {
   while(1) {
     funkyfunk();
@@ -168,6 +183,7 @@ int shell_funk(char **args) {
   }
   return 1;
 }
+
 int execute(char **args) {
 
   if(args[0] == NULL) {
@@ -189,20 +205,18 @@ void Funk_loop(void){
 
   do{
     funkyfunk();
-    printf("Funk_shell>> ");
-    reset();
-    bold_red();
-    line = read_line();
+    line = bread_line("Funk_shell>>\001\033[1;31m\002 ");
     args = split_line(line);
     status = execute(args);
     free(line);
     free(args);
   } while (status);
 }
+
 int main(int argc, char *argv[]){
   srand((unsigned) time(NULL));
   greet();
   Funk_loop();
-  printf("Danke für ihre Aufmerksamkeit, aufwiedersehen\n");
+  greet2();
   return EXIT_SUCCESS;
 }
