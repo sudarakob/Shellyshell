@@ -9,7 +9,7 @@
 
 //We thank buffet and his wonderful bread 
 
-//Farben
+//colors
 void red() {printf("\033[0;31m");}
 void bold_red() {printf("\033[1;31m");}
 void green() {printf("\033[0;32m");}
@@ -24,7 +24,7 @@ void cyan() {printf("\033[0;36m");}
 void bold_cyan() {printf("\033[1;36m");}
 void reset() {printf("\033[0m");}
 
-//zufallsfarben
+//randcolors
 void funkyfunk() {
   switch(rand() % 11){
     case 0: red(); break;
@@ -42,23 +42,25 @@ void funkyfunk() {
   }
 }
 
-//opening
+//opening--------------------------------------------------------------------------------------------------
 void greet(){
-  char greet[] = "Welcome to the funky Funk_shell, type help for overview!\n";
+  char greet[] = "Welcome to the funky Funk_shell, type help for overview!";
   char *current = strtok(greet, " ");
   for ( ;current != NULL; current= strtok(NULL, " ")){
     funkyfunk();
     printf("%s ", current);
   }
+  printf("\n");
 }
 
 void fake(){
-  char fake[] = "You thought I would let you escape, you unfunky son of a bitch?!\n";
+  char fake[] = "You thought I would let you escape, you unfunky son of a bitch?!";
   char *current = strtok(fake, " ");
   for ( ;current != NULL; current= strtok(NULL, " ")){
     funkyfunk();
     printf("%s ", current);
   }
+  printf("\n");
 }
 
 void greet2(){
@@ -68,7 +70,9 @@ void greet2(){
     funkyfunk();
     printf("%s ", current);
   }
+  reset();
 }
+//---------------------------------------------------------------------------------------------------------
 
 //TODO: token parser
 /*zerstückelt die vom User eingegebene Zeile in einzelne Argumente
@@ -129,7 +133,7 @@ int shell_genocide(char **args);
 int shell_exit(char **args);
 //-----------------------------------------------------------
 
-//Strings die zu den Befehlen gehören
+//Strings die zu den Befehlen gehören-----------------------
 char *built_in_str[] = {
   "help",
   "cd",
@@ -138,6 +142,7 @@ char *built_in_str[] = {
   "genocide",
   "exit"
 };
+//----------------------------------------------------------
 
 int (*built_in_f[]) (char **) = {
   &shell_help,
@@ -235,5 +240,6 @@ int main(int argc, char *argv[]){
   greet();
   Funk_loop();
   greet2();
+  reset();
   return EXIT_SUCCESS;
 }
