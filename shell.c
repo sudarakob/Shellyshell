@@ -26,7 +26,7 @@ void reset() {printf("\033[0m");}
 
 //randcolors
 void funkyfunk() {
-  switch(rand() % 11){
+  switch(rand() % 12){
     case 0: red(); break;
     case 1: bold_red(); break;
     case 2: green(); break;
